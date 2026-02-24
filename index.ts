@@ -3,6 +3,7 @@ import { name, version } from "./package.json";
 
 export type EnvInHtmlPluginOptions = {
   prefix?: string;
+  entries?: string[];
 };
 
 /**
@@ -12,6 +13,7 @@ export type EnvInHtmlPluginOptions = {
  *
  * @param {EnvInHtmlPluginOptions} [options] - Optional configuration for the plugin.
  * @param {string} [options.prefix="PUBLIC_"] - The prefix for environment variables to be included in the HTML. Only variables that start with this prefix will be injected. Default is "PUBLIC_".
+ * @param {string[]} [options.entries=["index.html"]] - The Custom Env variables to be injected into the HTML.
  */
 export default function EnvInHtml(
   options?: EnvInHtmlPluginOptions,
@@ -27,15 +29,28 @@ export default function EnvInHtml(
             setup(build) {
               build.finally("html", ({ contents }) => {
                 const prefix = options?.prefix || "PUBLIC_";
-                const envVars = Object.entries(process.env)
-                  .filter(([key]) => key.startsWith(prefix))
-                  .reduce(
-                    (acc, [key, value]) => {
-                      acc[key] = value!;
-                      return acc;
-                    },
-                    {} as Record<string, string>,
-                  );
+                const envVars = {
+                  ...Object.entries(process.env)
+                    .filter(([key]) => key.startsWith(prefix))
+                    .reduce(
+                      (acc, [key, value]) => {
+                        acc[key] = value!;
+                        return acc;
+                      },
+                      {} as Record<string, string>,
+                    ),
+                  ...(options?.entries
+                    ? options.entries.reduce(
+                        (acc, key) => {
+                          if (process.env[key]) {
+                            acc[key] = process.env[key]!;
+                          }
+                          return acc;
+                        },
+                        {} as Record<string, string>,
+                      )
+                    : {}),
+                };
                 const parsedContents = new HTMLRewriter()
                   .on("head", {
                     element(head) {
