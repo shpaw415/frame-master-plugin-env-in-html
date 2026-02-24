@@ -4,7 +4,16 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Test Plugin</title>
-  <script>globalThis.process ??= {}; globalThis.process.env ??= {"TEST_ENV_IN_HTML":"Hello World","TEST_ENV_IN_HTML_2":"Hello World 2"};</script><script type="module" crossorigin src="./chunk-p67rgywz.js"></script></head>
+    <script>
+      globalThis.process ??= {};
+      globalThis.process.env ??= {
+        TEST_ENV_IN_HTML: "Hello World",
+        TEST_ENV_IN_HTML_2: "Hello World 2",
+        NODE_ENV: "production",
+      };
+    </script>
+    <script type="module" crossorigin src="./chunk-p67rgywz.js"></script>
+  </head>
   <body>
     <h1>Test Plugin</h1>
     <p id="env-in-html"></p>

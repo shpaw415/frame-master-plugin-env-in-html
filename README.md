@@ -1,6 +1,6 @@
 # frame-master-plugin-env-in-html
 
-Frame-Master plugin
+A [Frame-Master](https://github.com/frame-master/frame-master) plugin that injects environment variables into your HTML during the build process, making them accessible to client-side scripts.
 
 ## Installation
 
@@ -10,22 +10,42 @@ bun add frame-master-plugin-env-in-html
 
 ## Usage
 
+Add the plugin to your `frame-master.config.ts`:
+
 ```typescript
-import type { FrameMasterConfig } from "frame-master/server/types";
-import framemasterpluginenvinhtml from "frame-master-plugin-env-in-html";
+import EnvInHtml from "frame-master-plugin-env-in-html";
 
-const config: FrameMasterConfig = {
-  HTTPServer: { port: 3000 },
-  plugins: [framemasterpluginenvinhtml()],
+export default {
+  plugins: [
+    EnvInHtml({
+      prefix: "PUBLIC_", // Optional: variables starting with this will be injected
+      entries: ["API_URL", "NODE_ENV"], // Optional: specific variables to inject
+    }),
+  ],
 };
-
-export default config;
 ```
+
+### Accessing variables in the browser
+
+The injected variables are available globally under `process.env`:
+
+```typescript
+console.log(process.env.PUBLIC_ANALYTICS_ID);
+console.log(process.env.API_URL);
+```
+
+## Configuration
+
+| Option    | Type       | Default     | Description                                                                 |
+| --------- | ---------- | ----------- | --------------------------------------------------------------------------- |
+| `prefix`  | `string`   | `"PUBLIC_"` | Only environment variables starting with this prefix will be injected.      |
+| `entries` | `string[]` | `[]`        | Specific environment variable keys to be injected regardless of the prefix. |
 
 ## Features
 
-- Feature 1
-- Feature 2
+- **Automated Injection**: Uses `HTMLRewriter` to inject a script tag into the `<head>` of your HTML files.
+- **Selective Exposure**: Only exposes variables you explicitly allow via prefix or direct naming, preventing accidental leakage of sensitive secrets.
+- **Client-Side Compatibility**: Seamlessly integrates with client-side code by shiming `globalThis.process.env`.
 
 ## License
 

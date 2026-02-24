@@ -8,6 +8,7 @@ export default {
   plugins: [
     EnvInHtml({
       prefix: "TEST_",
+      entries: ["NODE_ENV"],
     }),
   ],
   pluginsOptions: {
